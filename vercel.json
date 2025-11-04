@@ -1,7 +1,13 @@
 {
     "cleanUrls": true,
     "rewrites": [
-        
-        { "source": "/(.*)", "destination": "/index.html" }
+        {
+            "source": "/videos/:path*",
+            "destination": "/public/videos/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
     ]
 }
