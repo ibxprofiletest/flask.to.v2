@@ -41021,8 +41021,7 @@ const yue = {
                           title: "Flask Demo Video",
                           frameBorder: "0",
                           controls: true,
-                          autoplay : true,
-                          loop : true
+                          autoplay : false,
                         }),
                       }),
                     }),
