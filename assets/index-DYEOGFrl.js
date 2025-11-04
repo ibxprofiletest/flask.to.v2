@@ -41017,7 +41017,7 @@ const yue = {
                         children: u.jsx("video", {
                           className:
                             "absolute top-0 left-0 w-full h-full rounded-3xl",
-                          src: "assets/Introducing Flask (Notion + Loom for video).mp4",
+                          src: "/public/videos/Introducing-Flask.mp4",
                           title: "Flask Demo Video",
                           frameBorder: "0",
                           controls: true,
