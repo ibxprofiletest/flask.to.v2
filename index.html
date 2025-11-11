@@ -111,34 +111,44 @@
 <script>
   // Redirect "Get Started" button clicks to login page
   (function() {
-    // Function to check if element or its parents contain "Get Started" text
-    function containsGetStarted(element) {
-      if (!element) return false;
+    // Function to find the closest clickable parent element
+    function findClickableElement(element) {
+      if (!element) return null;
       
-      // Check the element itself
-      let text = (element.textContent || element.innerText || '').trim().toLowerCase();
-      if (text.includes('get started')) {
-        return true;
-      }
-      
-      // Check parent elements up to 5 levels deep
-      let parent = element.parentElement;
+      const clickableTags = ['BUTTON', 'A'];
+      let current = element;
       let depth = 0;
-      while (parent && depth < 5) {
-        text = (parent.textContent || parent.innerText || '').trim().toLowerCase();
-        if (text.includes('get started')) {
-          return true;
+      
+      while (current && depth < 5) {
+        // Check if current element is clickable
+        if (clickableTags.includes(current.tagName) || 
+            current.getAttribute('role') === 'button' ||
+            current.classList.contains('button') ||
+            current.classList.contains('btn') ||
+            current.onclick !== null) {
+          return current;
         }
-        parent = parent.parentElement;
+        current = current.parentElement;
         depth++;
       }
       
-      return false;
+      return null;
     }
     
-    // Set up click listener on document (capture phase to catch React events early)
+    // Set up click listener - only on actual user clicks
     document.addEventListener('click', function(e) {
-      if (containsGetStarted(e.target)) {
+      // Only process trusted user events (real mouse/touch clicks)
+      if (!e.isTrusted) return;
+      
+      // Find the clickable element
+      const clickableEl = findClickableElement(e.target);
+      if (!clickableEl) return;
+      
+      // Get text content and check if it's "Get Started"
+      const text = (clickableEl.textContent || clickableEl.innerText || '').trim().toLowerCase();
+      
+      // Only match if text is exactly "get started" or starts with "get started" followed by optional arrow/space
+      if (text === 'get started' || /^get started\s*[→>]?$/.test(text)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
