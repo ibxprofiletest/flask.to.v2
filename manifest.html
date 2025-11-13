@@ -75,6 +75,12 @@
       if (typeof global === "undefined") {
         window.global = window;
       }
+      
+      // Fix routing for manifest.html - change pathname before React Router initializes
+      if (window.location.pathname === '/manifest.html') {
+        // Replace the pathname in history without reload
+        window.history.replaceState({}, '', '/manifest');
+      }
     </script>
     <script type="module" crossorigin src="/assets/index-BSdqZrOg.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-BwckFq-M.css">
