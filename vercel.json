@@ -5,10 +5,6 @@
       "destination": "/manifest.html"
     },
     {
-      "source": "/(.*\\.(js|css|png|jpg|svg|woff|woff2|mp4|ico))",
-      "destination": "/$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
