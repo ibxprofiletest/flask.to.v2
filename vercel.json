@@ -4,10 +4,7 @@
       "source": "/manifest",
       "destination": "/manifest.html"
     },
-    {
-      "source": "/manifesto",
-      "destination": "/manifest.html"
-    },
+    
     {
       "source": "/((?!manifest\\.html|index\\.html|assets|images|fonts|svgs|.*\\.(js|css|png|jpg|jpeg|svg|woff|woff2|mp4|ico|json|xml|txt|html)).*)",
       "destination": "/index.html"
