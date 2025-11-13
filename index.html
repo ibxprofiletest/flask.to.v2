@@ -144,15 +144,30 @@
       const clickableEl = findClickableElement(e.target);
       if (!clickableEl) return;
       
-      // Get text content and check if it's "Get Started"
+      // Get text content
       const text = (clickableEl.textContent || clickableEl.innerText || '').trim().toLowerCase();
       
-      // Only match if text is exactly "get started" or starts with "get started" followed by optional arrow/space
+      // Handle "Get Started" button - redirect to login
       if (text === 'get started' || /^get started\s*[→>]?$/.test(text)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         window.location.href = 'https://flask.do/login';
+        return false;
+      }
+      
+      // Handle "Manifest" or "Manifesto" button - redirect to manifest.html
+      if (text === 'manifest' || text === 'manifesto' || /^manifesto\s*[→>]?$/.test(text)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        // Navigate to manifest.html
+        // Note: If you get a 404, your server needs to be configured to serve
+        // static .html files directly instead of routing everything to index.html
+        const manifestUrl = window.location.origin + '/manifest.html';
+        window.location.href = manifestUrl;
+        
         return false;
       }
     }, true); // Capture phase to intercept before React's event handlers
