@@ -156,14 +156,14 @@
         return false;
       }
       
-      // Handle "Manifest" or "Manifesto" button - redirect to manifest.html
+      // Handle "Manifest" or "Manifesto" button - navigate to manifest.html
       if (text === 'manifest' || text === 'manifesto' || /^manifesto\s*[→>]?$/.test(text)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         
-        // Navigate directly to manifest.html - Vercel serves static files automatically
-        window.location.href = window.location.origin + '/manifest.html';
+        // Use window.location.replace to avoid adding to history and bypass SPA routing
+        window.location.replace(window.location.origin + '/manifest.html');
         
         return false;
       }
