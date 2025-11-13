@@ -76,8 +76,12 @@
         window.global = window;
       }
       
-      // Keep the pathname as /manifest.html to avoid React Router issues
-      // Don't change it to /manifest as that triggers API calls
+      // Change pathname from /manifest.html to /manifesto before React Router initializes
+      // This ensures React Router can match the route correctly
+      if (window.location.pathname === '/manifest.html') {
+        // Use replaceState to change URL without reload, before React Router loads
+        window.history.replaceState({}, '', '/manifesto');
+      }
     </script>
     <script type="module" crossorigin src="/assets/index-BSdqZrOg.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-BwckFq-M.css">
