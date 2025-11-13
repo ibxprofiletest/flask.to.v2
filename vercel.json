@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/manifest.html",
+      "destination": "/manifest.html"
+    },
+    {
       "source": "/manifest",
       "destination": "/manifest.html"
     },
