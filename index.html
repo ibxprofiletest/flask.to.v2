@@ -329,6 +329,87 @@
       subtree: true
     });
   })();
+  
+  // Remove links from award icons
+  (function() {
+    function removeAwardLinks() {
+      // Find all links that contain award images or Product Hunt links
+      const links = document.querySelectorAll('a[href*="producthunt"], a[href*="product-hunt"]');
+      
+      links.forEach(link => {
+        // Check if this link contains an award image
+        const hasAwardImage = link.querySelector('img[src*="award"], img[src*="award2"], img[src*="award3"]') ||
+                              link.querySelector('svg') ||
+                              link.innerHTML.includes('award');
+        
+        if (hasAwardImage || link.href.includes('producthunt')) {
+          // Get all children
+          const children = Array.from(link.childNodes);
+          
+          // Create a span or div to replace the link
+          const container = document.createElement('span');
+          container.style.display = link.style.display || 'inline-block';
+          container.style.cssText = link.style.cssText;
+          
+          // Copy all children to the container
+          children.forEach(child => {
+            container.appendChild(child.cloneNode(true));
+          });
+          
+          // Copy classes and other attributes (except href)
+          Array.from(link.attributes).forEach(attr => {
+            if (attr.name !== 'href' && attr.name !== 'target' && attr.name !== 'rel') {
+              container.setAttribute(attr.name, attr.value);
+            }
+          });
+          
+          // Replace the link with the container
+          link.parentNode?.replaceChild(container, link);
+        }
+      });
+      
+      // Also find links by checking for award SVG files
+      const awardLinks = document.querySelectorAll('a');
+      awardLinks.forEach(link => {
+        const img = link.querySelector('img');
+        if (img && (img.src.includes('award') || img.src.includes('award2') || img.src.includes('award3'))) {
+          // Replace link with span
+          const span = document.createElement('span');
+          span.innerHTML = link.innerHTML;
+          span.className = link.className;
+          span.style.cssText = link.style.cssText;
+          
+          // Copy all attributes except href, target, rel
+          Array.from(link.attributes).forEach(attr => {
+            if (attr.name !== 'href' && attr.name !== 'target' && attr.name !== 'rel' && attr.name !== 'onclick') {
+              span.setAttribute(attr.name, attr.value);
+            }
+          });
+          
+          link.parentNode?.replaceChild(span, link);
+        }
+      });
+    }
+    
+    // Run immediately and after delays
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', removeAwardLinks);
+    } else {
+      removeAwardLinks();
+    }
+    
+    setTimeout(removeAwardLinks, 100);
+    setTimeout(removeAwardLinks, 500);
+    setTimeout(removeAwardLinks, 1000);
+    setTimeout(removeAwardLinks, 2000);
+    
+    // Watch for new elements
+    const observer = new MutationObserver(removeAwardLinks);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  })();
 </script>
 
 <script type="application/ld+json">
