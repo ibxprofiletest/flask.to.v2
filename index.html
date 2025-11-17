@@ -170,9 +170,394 @@
     }, true); // Capture phase to intercept before React's event handlers
   })();
   
-  // Add "CA: Coming Soon" button next to "Get Started" button
+  // Add "X" button to the left side of "Get Started" button in header
+  (function() {
+    function addXButton() {
+      // Find the "Get Started" button in the header
+      const getStartedButtons = Array.from(document.querySelectorAll('button, a[role="button"], [class*="button"]'));
+      let getStartedBtn = null;
+      
+      for (const btn of getStartedButtons) {
+        const text = (btn.textContent || btn.innerText || '').trim().toLowerCase();
+        if (text === 'get started' || text.startsWith('get started')) {
+          // Check if this button IS in header
+          const isInHeader = btn.closest('header') || 
+                           btn.closest('[class*="header"]') || 
+                           btn.closest('[class*="nav"]') ||
+                           btn.closest('[class*="menu"]');
+          if (isInHeader) {
+            getStartedBtn = btn;
+            break;
+          }
+        }
+      }
+      
+      if (!getStartedBtn) return;
+      
+      // Check if X button already exists
+      if (getStartedBtn.previousElementSibling && 
+          getStartedBtn.previousElementSibling.querySelector('svg') &&
+          (getStartedBtn.previousElementSibling.href?.includes('x.com') || 
+           getStartedBtn.previousElementSibling.href?.includes('twitter.com'))) {
+        return; // Already added
+      }
+      
+      // Get the parent container
+      const parent = getStartedBtn.parentElement;
+      if (!parent) return;
+      
+      // Clone the Get Started button to get the same style
+      const xButton = getStartedBtn.cloneNode(true);
+      
+      // Clear all child nodes and add X icon SVG
+      xButton.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px;">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+      `;
+      
+      // Copy all class names to ensure same styling
+      xButton.className = getStartedBtn.className;
+      xButton.setAttribute('class', getStartedBtn.getAttribute('class') || '');
+      
+      // Copy other important attributes that affect styling
+      Array.from(getStartedBtn.attributes).forEach(attr => {
+        if (attr.name.startsWith('data-') || attr.name.startsWith('aria-') || 
+            attr.name === 'type' || attr.name === 'role') {
+          xButton.setAttribute(attr.name, attr.value);
+        }
+      });
+      
+      // Set href to X/Twitter URL - convert to link if needed
+      let finalXButton = xButton;
+      if (xButton.tagName === 'A') {
+        xButton.href = 'https://x.com/flaskcreatives';
+        xButton.target = '_blank';
+        xButton.rel = 'noopener noreferrer';
+        finalXButton = xButton;
+      } else {
+        // If it's a button, convert to link
+        const link = document.createElement('a');
+        link.href = 'https://x.com/flaskcreatives';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.className = xButton.className;
+        link.innerHTML = xButton.innerHTML;
+        link.style.cssText = xButton.style.cssText;
+        Array.from(xButton.attributes).forEach(attr => {
+          if (attr.name !== 'type' && attr.name !== 'onclick') {
+            link.setAttribute(attr.name, attr.value);
+          }
+        });
+        finalXButton = link;
+      }
+      
+      // Copy all computed styles from Get Started button to ensure exact match
+      const getStartedStyles = window.getComputedStyle(getStartedBtn);
+      const styleProps = [
+        'backgroundColor', 'color', 'border', 'borderRadius', 'borderTopLeftRadius', 
+        'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius',
+        'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+        'fontSize', 'fontWeight', 'fontFamily', 'lineHeight', 'textAlign',
+        'boxShadow', 'transition', 'cursor', 'display', 'width', 'height',
+        'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
+        'borderColor', 'borderWidth', 'borderStyle', 'borderTop', 'borderRight',
+        'borderBottom', 'borderLeft', 'margin', 'marginTop', 'marginRight',
+        'marginBottom', 'marginLeft', 'textTransform', 'letterSpacing'
+      ];
+      
+      styleProps.forEach(prop => {
+        try {
+          const value = getStartedStyles.getPropertyValue(prop);
+          if (value && value !== 'none' && value !== 'normal') {
+            finalXButton.style.setProperty(prop, value);
+          }
+        } catch (e) {
+          // Some properties might not be directly settable
+        }
+      });
+      
+      // Ensure it's a flex container for centering the icon
+      finalXButton.style.display = 'flex';
+      finalXButton.style.alignItems = 'center';
+      finalXButton.style.justifyContent = 'center';
+      finalXButton.style.flexShrink = '0';
+      finalXButton.style.width = 'auto';
+      finalXButton.style.marginRight = '12px';
+      
+      // Force horizontal layout - override any column layout
+      parent.style.display = 'flex';
+      parent.style.flexDirection = 'row';
+      parent.style.alignItems = 'center';
+      parent.style.gap = '12px';
+      parent.style.flexWrap = 'nowrap';
+      
+      // Insert before Get Started button
+      parent.insertBefore(finalXButton, getStartedBtn);
+    }
+    
+    // Try to add the button multiple times as React renders
+    function tryAddXButton() {
+      addXButton();
+    }
+    
+    // Run immediately and after delays
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryAddXButton);
+    } else {
+      tryAddXButton();
+    }
+    
+    setTimeout(tryAddXButton, 100);
+    setTimeout(tryAddXButton, 500);
+    setTimeout(tryAddXButton, 1000);
+    setTimeout(tryAddXButton, 2000);
+    
+    // Watch for new elements
+    const observer = new MutationObserver(tryAddXButton);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  })();
+  
+  // Add "Coming Soon" button to the right side of "Get Started" button in header
+  (function() {
+    function addComingSoonButton() {
+      // Find the "Get Started" button in the header
+      const getStartedButtons = Array.from(document.querySelectorAll('button, a[role="button"], [class*="button"]'));
+      let getStartedBtn = null;
+      
+      for (const btn of getStartedButtons) {
+        const text = (btn.textContent || btn.innerText || '').trim().toLowerCase();
+        if (text === 'get started' || text.startsWith('get started')) {
+          // Check if this button IS in header
+          const isInHeader = btn.closest('header') || 
+                           btn.closest('[class*="header"]') || 
+                           btn.closest('[class*="nav"]') ||
+                           btn.closest('[class*="menu"]');
+          if (isInHeader) {
+            getStartedBtn = btn;
+            break;
+          }
+        }
+      }
+      
+      if (!getStartedBtn) return;
+      
+      // Check if Coming Soon button already exists
+      if (getStartedBtn.nextElementSibling && 
+          getStartedBtn.nextElementSibling.textContent && 
+          (getStartedBtn.nextElementSibling.textContent.includes('Coming Soon') || 
+           getStartedBtn.nextElementSibling.textContent.includes('CA:'))) {
+        return; // Already added
+      }
+      
+      // Get the parent container
+      const parent = getStartedBtn.parentElement;
+      if (!parent) return;
+      
+      // Clone the Get Started button to get the same style
+      const comingSoonButton = getStartedBtn.cloneNode(true);
+      
+      // Clear all child nodes and update content
+      comingSoonButton.innerHTML = 'CA: Coming Soon';
+      comingSoonButton.textContent = 'CA: Coming Soon';
+      
+      // Copy all class names to ensure same styling
+      comingSoonButton.className = getStartedBtn.className;
+      comingSoonButton.setAttribute('class', getStartedBtn.getAttribute('class') || '');
+      
+      // Copy other important attributes that affect styling
+      Array.from(getStartedBtn.attributes).forEach(attr => {
+        if (attr.name.startsWith('data-') || attr.name.startsWith('aria-') || 
+            attr.name === 'type' || attr.name === 'role') {
+          comingSoonButton.setAttribute(attr.name, attr.value);
+        }
+      });
+      
+      // Remove the onClick handler
+      comingSoonButton.onclick = null;
+      comingSoonButton.removeAttribute('onclick');
+      
+      // Copy all computed styles from Get Started button to ensure exact match
+      const getStartedStyles = window.getComputedStyle(getStartedBtn);
+      const styleProps = [
+        'backgroundColor', 'color', 'border', 'borderRadius', 'borderTopLeftRadius', 
+        'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius',
+        'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+        'fontSize', 'fontWeight', 'fontFamily', 'lineHeight', 'textAlign',
+        'boxShadow', 'transition', 'cursor', 'display', 'width', 'height',
+        'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
+        'borderColor', 'borderWidth', 'borderStyle', 'borderTop', 'borderRight',
+        'borderBottom', 'borderLeft', 'margin', 'marginTop', 'marginRight',
+        'marginBottom', 'marginLeft', 'textTransform', 'letterSpacing'
+      ];
+      
+      styleProps.forEach(prop => {
+        try {
+          const value = getStartedStyles.getPropertyValue(prop);
+          if (value && value !== 'none' && value !== 'normal') {
+            comingSoonButton.style.setProperty(prop, value);
+          }
+        } catch (e) {
+          // Some properties might not be directly settable
+        }
+      });
+      
+      // Make it look the same but indicate it's coming soon
+      comingSoonButton.style.cursor = 'default';
+      comingSoonButton.style.opacity = '1';
+      if (comingSoonButton.tagName === 'BUTTON') {
+        comingSoonButton.disabled = false;
+      }
+      
+      // Prevent navigation but keep same visual style
+      comingSoonButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }, true);
+      
+      // Also prevent any React event handlers
+      comingSoonButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }, false);
+      
+      // Force horizontal layout - override any column layout
+      parent.style.display = 'flex';
+      parent.style.flexDirection = 'row';
+      parent.style.alignItems = 'center';
+      parent.style.gap = '12px';
+      parent.style.flexWrap = 'nowrap';
+      
+      // Set both buttons to display: flex
+      getStartedBtn.style.display = 'flex';
+      getStartedBtn.style.flexShrink = '0';
+      getStartedBtn.style.width = 'auto';
+      getStartedBtn.style.marginRight = '12px';
+      getStartedBtn.style.alignItems = 'center';
+      getStartedBtn.style.justifyContent = 'center';
+      
+      // Insert after Get Started button
+      if (getStartedBtn.nextSibling) {
+        parent.insertBefore(comingSoonButton, getStartedBtn.nextSibling);
+      } else {
+        parent.appendChild(comingSoonButton);
+      }
+      
+      // Style the Coming Soon button for horizontal layout with flex display
+      comingSoonButton.style.display = 'flex';
+      comingSoonButton.style.flexShrink = '0';
+      comingSoonButton.style.width = 'auto';
+      comingSoonButton.style.alignItems = 'center';
+      comingSoonButton.style.justifyContent = 'center';
+      comingSoonButton.style.marginLeft = '0'; // Gap handles spacing
+    }
+    
+    // Try to add the button multiple times as React renders
+    function tryAddComingSoonButton() {
+      addComingSoonButton();
+    }
+    
+    // Run immediately and after delays
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryAddComingSoonButton);
+    } else {
+      tryAddComingSoonButton();
+    }
+    
+    setTimeout(tryAddComingSoonButton, 100);
+    setTimeout(tryAddComingSoonButton, 500);
+    setTimeout(tryAddComingSoonButton, 1000);
+    setTimeout(tryAddComingSoonButton, 2000);
+    
+    // Watch for new elements
+    const observer = new MutationObserver(tryAddComingSoonButton);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  })();
+  
+  // Remove "Coming Soon" and "Book Demo" buttons from hero section, keep only "Get Started"
+  (function() {
+    function removeExtraButtons() {
+      // Find all buttons on the page
+      const allButtons = Array.from(document.querySelectorAll('button, a[role="button"], a[class*="button"], [class*="button"]'));
+      
+      allButtons.forEach(btn => {
+        // Skip if in header
+        const isInHeader = btn.closest('header') || 
+                         btn.closest('[class*="header"]') || 
+                         btn.closest('[class*="nav"]') ||
+                         btn.closest('[class*="menu"]');
+        if (isInHeader) return;
+        
+        const text = (btn.textContent || btn.innerText || '').trim().toLowerCase();
+        
+        // Keep only "Get Started" button
+        if (text.includes('get started')) {
+          return;
+        }
+        
+        // Remove "Coming Soon" button
+        if (text.includes('coming soon') || text.includes('ca:')) {
+          btn.remove();
+          return;
+        }
+        
+        // Remove "Book a Demo" button
+        if (text.includes('book a demo') || text.includes('book demo') || text.includes('demo')) {
+          btn.remove();
+          return;
+        }
+        
+        // Also check aria-label and title attributes
+        const ariaLabel = (btn.getAttribute('aria-label') || '').toLowerCase();
+        const title = (btn.getAttribute('title') || '').toLowerCase();
+        if ((ariaLabel.includes('book a demo') || ariaLabel.includes('book demo') ||
+             title.includes('book a demo') || title.includes('book demo')) &&
+            !text.includes('get started')) {
+          btn.remove();
+        }
+      });
+    }
+    
+    // Run immediately and after delays - more frequent to catch dynamically added buttons
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', removeExtraButtons);
+    } else {
+      removeExtraButtons();
+    }
+    
+    setTimeout(removeExtraButtons, 50);
+    setTimeout(removeExtraButtons, 100);
+    setTimeout(removeExtraButtons, 200);
+    setTimeout(removeExtraButtons, 500);
+    setTimeout(removeExtraButtons, 1000);
+    setTimeout(removeExtraButtons, 2000);
+    setTimeout(removeExtraButtons, 3000);
+    
+    // Watch for new elements with immediate callback
+    const observer = new MutationObserver(function(mutations) {
+      removeExtraButtons();
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: false
+    });
+  })();
+  
+  // DISABLED: Add "CA: Coming Soon" button next to "Get Started" button
   (function() {
     function addCAButton() {
+      return; // Disabled - we want to remove this button instead
       // Find the "Get Started" button
       const getStartedButtons = Array.from(document.querySelectorAll('button, a[role="button"], [class*="button"]'));
       let getStartedBtn = null;
