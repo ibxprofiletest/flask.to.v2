@@ -169,6 +169,166 @@
       }
     }, true); // Capture phase to intercept before React's event handlers
   })();
+  
+  // Add "CA: Coming Soon" button next to "Get Started" button
+  (function() {
+    function addCAButton() {
+      // Find the "Get Started" button
+      const getStartedButtons = Array.from(document.querySelectorAll('button, a[role="button"], [class*="button"]'));
+      let getStartedBtn = null;
+      
+      for (const btn of getStartedButtons) {
+        const text = (btn.textContent || btn.innerText || '').trim().toLowerCase();
+        if (text === 'get started' || text.startsWith('get started')) {
+          getStartedBtn = btn;
+          break;
+        }
+      }
+      
+      if (!getStartedBtn) return;
+      
+      // Check if CA button already exists
+      if (getStartedBtn.nextElementSibling && 
+          getStartedBtn.nextElementSibling.textContent && 
+          getStartedBtn.nextElementSibling.textContent.includes('CA: Coming Soon')) {
+        return; // Already added
+      }
+      
+      // Get the parent container
+      const parent = getStartedBtn.parentElement;
+      if (!parent) return;
+      
+      // Clone the Get Started button to get the same style
+      const caButton = getStartedBtn.cloneNode(true);
+      
+      // Clear all child nodes and update content
+      caButton.innerHTML = 'CA: Coming Soon';
+      caButton.textContent = 'CA: Coming Soon';
+      
+      // Copy all class names to ensure same styling
+      caButton.className = getStartedBtn.className;
+      caButton.setAttribute('class', getStartedBtn.getAttribute('class') || '');
+      
+      // Copy other important attributes that affect styling
+      const attrsToCopy = ['data-*', 'aria-*'];
+      Array.from(getStartedBtn.attributes).forEach(attr => {
+        if (attr.name.startsWith('data-') || attr.name.startsWith('aria-') || 
+            attr.name === 'type' || attr.name === 'role') {
+          caButton.setAttribute(attr.name, attr.value);
+        }
+      });
+      
+      // Remove the onClick handler
+      caButton.onclick = null;
+      caButton.removeAttribute('onclick');
+      
+      // Copy all computed styles from Get Started button to ensure exact match
+      const getStartedStyles = window.getComputedStyle(getStartedBtn);
+      const styleProps = [
+        'backgroundColor', 'color', 'border', 'borderRadius', 'borderTopLeftRadius', 
+        'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius',
+        'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+        'fontSize', 'fontWeight', 'fontFamily', 'lineHeight', 'textAlign',
+        'boxShadow', 'transition', 'cursor', 'display', 'width', 'height',
+        'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
+        'borderColor', 'borderWidth', 'borderStyle', 'borderTop', 'borderRight',
+        'borderBottom', 'borderLeft', 'margin', 'marginTop', 'marginRight',
+        'marginBottom', 'marginLeft', 'textTransform', 'letterSpacing'
+      ];
+      
+      styleProps.forEach(prop => {
+        try {
+          const value = getStartedStyles.getPropertyValue(prop);
+          if (value && value !== 'none' && value !== 'normal') {
+            caButton.style.setProperty(prop, value);
+          }
+        } catch (e) {
+          // Some properties might not be directly settable
+        }
+      });
+      
+      // Override font size to 14px for CA button
+      caButton.style.setProperty('font-size', '14px', 'important');
+      
+      // Make it look the same but indicate it's coming soon
+      caButton.style.cursor = 'default';
+      caButton.style.opacity = '1'; // Keep full opacity to match Get Started
+      if (caButton.tagName === 'BUTTON') {
+        caButton.disabled = false; // Don't disable to keep same appearance
+      }
+      
+      // Prevent navigation but keep same visual style
+      caButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }, true);
+      
+      // Also prevent any React event handlers
+      caButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }, false);
+      
+      // Force horizontal layout - override any column layout
+      parent.style.display = 'flex';
+      parent.style.flexDirection = 'row';
+      parent.style.alignItems = 'center';
+      parent.style.gap = '12px';
+      parent.style.flexWrap = 'nowrap';
+      
+      // Set both buttons to display: flex
+      getStartedBtn.style.display = 'flex';
+      getStartedBtn.style.flexShrink = '0';
+      getStartedBtn.style.width = 'auto';
+      getStartedBtn.style.marginRight = '12px';
+      getStartedBtn.style.alignItems = 'center';
+      getStartedBtn.style.justifyContent = 'center';
+      
+      // Insert after Get Started button
+      if (getStartedBtn.nextSibling) {
+        parent.insertBefore(caButton, getStartedBtn.nextSibling);
+      } else {
+        parent.appendChild(caButton);
+      }
+      
+      // Style the CA button for horizontal layout with flex display
+      caButton.style.display = 'flex';
+      caButton.style.flexShrink = '0';
+      caButton.style.width = 'auto';
+      caButton.style.alignItems = 'center';
+      caButton.style.justifyContent = 'center';
+      caButton.style.marginLeft = '0'; // Gap handles spacing
+      // Font size already set above with !important
+    }
+    
+    // Try to add the button multiple times as React renders
+    function tryAddCAButton() {
+      addCAButton();
+    }
+    
+    // Run immediately and after delays
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryAddCAButton);
+    } else {
+      tryAddCAButton();
+    }
+    
+    setTimeout(tryAddCAButton, 100);
+    setTimeout(tryAddCAButton, 500);
+    setTimeout(tryAddCAButton, 1000);
+    setTimeout(tryAddCAButton, 2000);
+    
+    // Watch for new elements
+    const observer = new MutationObserver(tryAddCAButton);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  })();
 </script>
 
 <script type="application/ld+json">
