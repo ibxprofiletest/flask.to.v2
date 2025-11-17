@@ -795,6 +795,115 @@
       subtree: true
     });
   })();
+  
+  // Replace Discord icon and link with X (Twitter) in Talk To Humans section
+  (function() {
+    function replaceDiscordWithX() {
+      const xIconSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+      
+      // Find all links with Discord URL
+      const discordLinks = document.querySelectorAll('a[href*="discord"], a[href*="discord.gg"]');
+      
+      discordLinks.forEach(link => {
+        if (link.href.includes('discord')) {
+          // Replace href with X/Twitter URL
+          link.href = 'https://x.com/flaskcreatives';
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          
+          // Replace Discord image/icon with X icon
+          const img = link.querySelector('img[src*="discord"], img[alt*="Discord" i]');
+          const svg = link.querySelector('svg');
+          
+          if (img) {
+            const svgContainer = document.createElement('span');
+            svgContainer.innerHTML = xIconSvg;
+            svgContainer.style.display = 'inline-block';
+            svgContainer.style.width = img.width || img.style.width || '24px';
+            svgContainer.style.height = img.height || img.style.height || '24px';
+            if (img.style.cssText) {
+              svgContainer.style.cssText = img.style.cssText;
+            }
+            img.parentNode?.replaceChild(svgContainer, img);
+          } else if (svg) {
+            // Replace existing SVG with X icon
+            svg.outerHTML = xIconSvg;
+          } else {
+            // If no image or SVG, check if text contains "Community" or "Discord"
+            const linkText = (link.textContent || '').toLowerCase();
+            if (linkText.includes('community') || linkText.includes('discord')) {
+              // Add X icon before the text
+              const iconSpan = document.createElement('span');
+              iconSpan.innerHTML = xIconSvg;
+              iconSpan.style.display = 'inline-block';
+              iconSpan.style.marginRight = '8px';
+              iconSpan.style.verticalAlign = 'middle';
+              link.insertBefore(iconSpan, link.firstChild);
+            }
+          }
+        }
+      });
+      
+      // Also find by Discord images/icons
+      const discordImages = document.querySelectorAll('img[src*="discord"], img[alt*="Discord" i]');
+      discordImages.forEach(img => {
+        const link = img.closest('a');
+        if (link && link.href.includes('discord')) {
+          const svgContainer = document.createElement('span');
+          svgContainer.innerHTML = xIconSvg;
+          svgContainer.style.display = 'inline-block';
+          svgContainer.style.width = img.width || img.style.width || '24px';
+          svgContainer.style.height = img.height || img.style.height || '24px';
+          svgContainer.style.color = window.getComputedStyle(img).color || 'currentColor';
+          if (img.style.cssText) {
+            svgContainer.style.cssText = img.style.cssText;
+          }
+          img.parentNode?.replaceChild(svgContainer, img);
+          link.href = 'https://x.com/flaskcreatives';
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+        }
+      });
+      
+      // Also check for SVG elements that might be Discord icons
+      const allSvgs = document.querySelectorAll('svg');
+      allSvgs.forEach(svg => {
+        const link = svg.closest('a');
+        if (link && (link.href.includes('discord') || link.href.includes('discord.gg'))) {
+          // Check if this is in the "Talk to Humans" section
+          const section = link.closest('section') || link.closest('div');
+          if (section) {
+            const sectionText = (section.textContent || '').toLowerCase();
+            if (sectionText.includes('talk to humans') || sectionText.includes('community')) {
+              svg.outerHTML = xIconSvg;
+              link.href = 'https://x.com/flaskcreatives';
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+            }
+          }
+        }
+      });
+    }
+    
+    // Run immediately and after delays
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', replaceDiscordWithX);
+    } else {
+      replaceDiscordWithX();
+    }
+    
+    setTimeout(replaceDiscordWithX, 100);
+    setTimeout(replaceDiscordWithX, 500);
+    setTimeout(replaceDiscordWithX, 1000);
+    setTimeout(replaceDiscordWithX, 2000);
+    
+    // Watch for new elements
+    const observer = new MutationObserver(replaceDiscordWithX);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  })();
 </script>
 
 <script type="application/ld+json">
