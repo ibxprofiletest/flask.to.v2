@@ -164,7 +164,7 @@
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
-      window.open('https://flask.do/login', '_blank', 'noopener,noreferrer');
+      window.location.href = 'https://flask.do/login';
       return false;
     }
     
@@ -180,12 +180,12 @@
       // Get text content
       const text = (clickableEl.textContent || clickableEl.innerText || '').trim().toLowerCase();
       
-      // Handle "Get Started" button - open login in new tab
+      // Handle "Get Started" button - redirect to login
       if (text === 'get started' || /^get started\s*[→>]?$/.test(text)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.open('https://flask.do/login', '_blank', 'noopener,noreferrer');
+        window.location.href = 'https://flask.do/login';
         return false;
       }
       
