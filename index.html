@@ -419,8 +419,8 @@
       const comingSoonButton = getStartedBtn.cloneNode(true);
       
       // Clear all child nodes and update content
-      comingSoonButton.innerHTML = 'CA: AcQnpZYfWgZNbWjcpa2tVuEajnZvcJKzZSRZhSXVpump';
-      comingSoonButton.textContent = 'CA: AcQnpZYfWgZNbWjcpa2tVuEajnZvcJKzZSRZhSXVpump';
+      comingSoonButton.innerHTML = 'CA: Coming Soon';
+      comingSoonButton.textContent = 'CA: Coming Soon';
       
       // Copy all class names to ensure same styling
       comingSoonButton.className = getStartedBtn.className;
@@ -470,16 +470,71 @@
         comingSoonButton.disabled = false;
       }
       
-      // Prevent navigation but keep same visual style
+      // Handle click: copy to clipboard, show "Copied", then revert
       comingSoonButton.addEventListener('click', function(e) {
+        if (!e.isTrusted) return;
+        
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
+        
+        // Store original text
+        const originalText = 'CA: Coming Soon';
+        const button = e.currentTarget;
+        
+        // Copy current page URL to clipboard
+        const urlToCopy = window.location.href;
+        
+        // Copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(urlToCopy).then(() => {
+            // Change text to "Copied"
+            button.textContent = 'Copied';
+            button.innerHTML = 'Copied';
+            
+            // Revert back to original text after 2 seconds
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.innerHTML = originalText;
+            }, 2000);
+          }).catch(err => {
+            console.error('Failed to copy:', err);
+            // Fallback: still show feedback
+            button.textContent = 'Copied';
+            button.innerHTML = 'Copied';
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.innerHTML = originalText;
+            }, 2000);
+          });
+        } else {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = urlToCopy;
+          textArea.style.position = 'fixed';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            button.textContent = 'Copied';
+            button.innerHTML = 'Copied';
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.innerHTML = originalText;
+            }, 2000);
+          } catch (err) {
+            console.error('Failed to copy:', err);
+          }
+          document.body.removeChild(textArea);
+        }
+        
         return false;
       }, true);
       
       // Also prevent any React event handlers
       comingSoonButton.addEventListener('click', function(e) {
+        if (!e.isTrusted) return;
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
@@ -515,7 +570,85 @@
       comingSoonButton.style.alignItems = 'center';
       comingSoonButton.style.justifyContent = 'center';
       comingSoonButton.style.marginLeft = '0'; // Gap handles spacing
+      
+      // Add a data attribute to identify this button
+      comingSoonButton.setAttribute('data-coming-soon-button', 'true');
     }
+    
+    // Add global click handler for Coming Soon buttons
+    function addGlobalComingSoonHandler() {
+      // Find buttons by data attribute or text content
+      const comingSoonButtons = document.querySelectorAll('[data-coming-soon-button="true"]');
+      
+      // Also find by text content
+      const allButtons = Array.from(document.querySelectorAll('button, a[role="button"]'));
+      const comingSoonBtns = allButtons.filter(btn => {
+        const text = (btn.textContent || btn.innerText || '').trim();
+        return (text === 'CA: Coming Soon' || text.includes('Coming Soon')) && 
+               !btn.hasAttribute('data-coming-soon-handled');
+      });
+      
+      [...comingSoonButtons, ...comingSoonBtns].forEach(button => {
+        // Mark as handled to avoid duplicate handlers
+        button.setAttribute('data-coming-soon-handled', 'true');
+        
+        // Add click handler
+        button.addEventListener('click', function(e) {
+          if (!e.isTrusted) return;
+          
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          
+          const originalText = 'CA: Coming Soon';
+          const urlToCopy = window.location.href;
+          
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(urlToCopy).then(() => {
+              button.textContent = 'Copied';
+              button.innerHTML = 'Copied';
+              setTimeout(() => {
+                button.textContent = originalText;
+                button.innerHTML = originalText;
+              }, 2000);
+            }).catch(() => {
+              button.textContent = 'Copied';
+              button.innerHTML = 'Copied';
+              setTimeout(() => {
+                button.textContent = originalText;
+                button.innerHTML = originalText;
+              }, 2000);
+            });
+          } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = urlToCopy;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+              document.execCommand('copy');
+              button.textContent = 'Copied';
+              button.innerHTML = 'Copied';
+              setTimeout(() => {
+                button.textContent = originalText;
+                button.innerHTML = originalText;
+              }, 2000);
+            } catch (err) {
+              console.error('Failed to copy:', err);
+            }
+            document.body.removeChild(textArea);
+          }
+          
+          return false;
+        }, true);
+      });
+    }
+    
+    // Add global handler after button is created
+    setTimeout(addGlobalComingSoonHandler, 100);
+    setTimeout(addGlobalComingSoonHandler, 500);
+    setTimeout(addGlobalComingSoonHandler, 1000);
     
     // Try to add the button multiple times as React renders
     function tryAddComingSoonButton() {
@@ -645,8 +778,8 @@
       const caButton = getStartedBtn.cloneNode(true);
       
       // Clear all child nodes and update content
-      caButton.innerHTML = 'CA: AcQnpZYfWgZNbWjcpa2tVuEajnZvcJKzZSRZhSXVpump';
-      caButton.textContent = 'CA: AcQnpZYfWgZNbWjcpa2tVuEajnZvcJKzZSRZhSXVpump';
+      caButton.innerHTML = 'CA: Coming Soon';
+      caButton.textContent = 'CA: Coming Soon';
       
       // Copy all class names to ensure same styling
       caButton.className = getStartedBtn.className;
