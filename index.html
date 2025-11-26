@@ -281,28 +281,30 @@
       });
       
       // Set href to X/Twitter URL - convert to link if needed
-      let finalXButton = link;
-      if (xButton.tagName === 'A') {
-        xButton.href = 'https://x.com/flaskcreatives';
-        xButton.target = '_blank';
-        xButton.rel = 'noopener noreferrer';
-        finalXButton = link;
-      } else {
-        // If it's a button, convert to link
-        const link = document.createElement('a');
-        link.href = 'https://x.com/flaskcreatives';
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.className = xButton.className;
-        link.innerHTML = xButton.innerHTML;
-        link.style.cssText = xButton.style.cssText;
-        Array.from(xButton.attributes).forEach(attr => {
-          if (attr.name !== 'type' && attr.name !== 'onclick') {
-            link.setAttribute(attr.name, attr.value);
-          }
-        });
-        finalXButton = link;
-      }
+      // Set href to X/Twitter URL - convert to link if needed
+let finalXButton;
+
+if (xButton.tagName === 'A') {
+  xButton.href = 'https://x.com/flaskcreatives';
+  xButton.target = '_blank';
+  xButton.rel = 'noopener noreferrer';
+  finalXButton = xButton; // Use xButton here since it's already an anchor tag
+} else {
+  // If it's a button, convert to link
+  const link = document.createElement('a');
+  link.href = 'https://x.com/flaskcreatives';
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.className = xButton.className;
+  link.innerHTML = xButton.innerHTML;
+  link.style.cssText = xButton.style.cssText;
+  Array.from(xButton.attributes).forEach(attr => {
+    if (attr.name !== 'type' && attr.name !== 'onclick') {
+      link.setAttribute(attr.name, attr.value);
+    }
+  });
+  finalXButton = link;
+}
       
       // Copy all computed styles from Get Started button to ensure exact match
       const getStartedStyles = window.getComputedStyle(getStartedBtn);
